@@ -1,6 +1,7 @@
 #include "calibration.h"
 
 #include <glog/logging.h>
+#include <fstream>
 
 #define EEPROM_SIZE 131072
 
@@ -98,6 +99,12 @@ aditof::Status Calibration::getAfeFirmware(const std::string &mode,
             }
         }
     }
+
+    std::ofstream firmware_file("firmware_" + mode + ".bin", std::ios::binary);
+
+    firmware_file.write(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(uint16_t));
+
+    firmware_file.close();
 
     return Status::GENERIC_ERROR;
 }
