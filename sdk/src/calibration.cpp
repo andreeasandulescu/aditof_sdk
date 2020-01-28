@@ -94,17 +94,22 @@ aditof::Status Calibration::getAfeFirmware(const std::string &mode,
                     for (const auto &value : packet.second.value) {
                         data.push_back(static_cast<uint16_t>(value));
                     }
-                    return Status::OK;
+                   // return Status::OK;
                 }
             }
         }
     }
 
-    std::ofstream firmware_file("firmware_" + mode + ".bin", std::ios::binary);
+    std::ofstream firmware_file("/home/pi/workspace/github/aditof_sdk/firmware.bin", std::ios::binary);
 
-    firmware_file.write(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(uint16_t));
+    firmware_file.write(reinterpret_cast<const char*>(&data[0]), data.size() * sizeof(uint16_t));
 
     firmware_file.close();
+
+    LOG(WARNING) << "Wrote firmware to file! ";
+    std::cerr << " Wrote firmware " <<  std::endl;
+
+    return Status::OK;
 
     return Status::GENERIC_ERROR;
 }

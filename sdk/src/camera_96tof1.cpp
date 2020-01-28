@@ -31,11 +31,11 @@ aditof::Status Camera96Tof1::initialize() {
         return status;
     }
 
-    status = m_calibration.readCalMap(m_device);
-    if (status != Status::OK) {
-        LOG(WARNING) << "Failed to read calibration data from eeprom";
-        return status;
-    }
+    //status = m_calibration.readCalMap(m_device);
+    //if (status != Status::OK) {
+      //  LOG(WARNING) << "Failed to read calibration data from eeprom";
+        //return status;
+    //}
 
     m_details.bitCount = 12;
 

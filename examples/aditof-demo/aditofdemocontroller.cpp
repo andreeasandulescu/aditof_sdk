@@ -151,7 +151,7 @@ void AdiTofDemoController::setMode(const std::string &mode) {
         return;
     }
     auto camera = m_cameras[static_cast<unsigned int>(m_cameraInUse)];
-    camera->setMode(mode);
+    camera->setMode("custom", "firmware.bin");
 }
 
 std::pair<float, float> AdiTofDemoController::getTemperature() {
