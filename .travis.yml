@@ -48,7 +48,7 @@ matrix:
       addons: { apt: { packages: ["g++-8", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
     
     - env: ROS_DISTRO=kinetic
-           CATKIN_OPTIONS=$TRAVIS_BUILD_DIR/bindings/ros/catkin.options
+           CATKIN_OPTIONS=${TRAVIS_BUILD_DIR}/bindings/ros/catkin.options
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_EXAMPLES=true
            
@@ -85,12 +85,12 @@ matrix:
       addons: { apt: { packages: ["cmake", "graphviz"] } }
 
 before_install:
-    - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $TRAVIS_DIST main\" > /etc/apt/sources.list.d/ros-latest.list"
+    - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu ${TRAVIS_DIST} main\" > /etc/apt/sources.list.d/ros-latest.list"
     - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - sudo apt-get update -qq
-    - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-ros-base 
-    - if [ "$ROS_EXAMPLES" ] ;  sudo apt-get install -y ros-$ROS_DISTRO-rviz ; fi
-    - source /opt/ros/$ROS_DISTRO/setup.bash
+    - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-${ROS_DISTRO}-ros-base 
+    - if [ "{$ROS_EXAMPLES}" ] ;  sudo apt-get install -y ros-${ROS_DISTRO}-rviz ; fi
+    - source /opt/ros/${ROS_DISTRO}/setup.bash
     - sudo rosdep init
     - rosdep update
 
