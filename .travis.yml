@@ -27,6 +27,7 @@ before_install:
     - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - sudo apt-get update -qq
     - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-ros-base
+     - if [ "$ROS_EXAMPLES" ];  sudo apt-get install -y rosinstall_generator ; fi
     - source /opt/ros/$ROS_DISTRO/setup.bash
     - sudo rosdep init
     - rosdep update
@@ -44,12 +45,11 @@ install:
 
 before_script:
   # source dependencies: install using wstool.
-  - cd ~/catkin_ws/src
-  - wstool init
-  - if [[ -f $ROSINSTALL_FILE ]] ; then wstool merge $ROSINSTALL_FILE ; fi
-  - wstool up
-  # package depdencies: install using rosdep.
   - cd ~/catkin_ws
+  - wstool init src
+  - if [ "$ROS_EXAMPLES" = true ]; then rosinstall_generator rviz --rosdistro $ROS_DISTRO --deps --tar --exclude RPP | wstool merge -t src - ; fi
+  - wstool update -t src
+  # package depdencies: install using rosdep.
   - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 
 script:
