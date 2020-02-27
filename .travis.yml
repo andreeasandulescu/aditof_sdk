@@ -1,22 +1,89 @@
-os: linux
-cache:
-  - apt
+language: cpp
 
-language: generic
-matrix:
-  include:
-  - name: "Bionic melodic"
-    dist: bionic
-    env: ROS_DISTRO=melodic
-  - name: "Xenial kinetic"
-    dist: xenial
-    env: ROS_DISTRO=kinetic
+os: linux
+dist: trusty
+
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/deps
+
+services:
+  - docker
 
 env:
   global:
-    - ROS_CI_DESKTOP="`lsb_release -cs`"
-    - CATKIN_OPTIONS=$TRAVIS_BUILD_DIR/bindings/ros/catkin.options
-    - ROS_PARALLEL_JOBS='-j8 -l6'
+    secure: "eAP3LhNMcYTo6HICr1lqgXA7VD+Br4U1S/wNBjQ4/kSpv/vV3Dfl9vDTAtQNwf0G9RQ9oUGd9QyPEncFc7DeQTx3Xnsa811tpGG2o9pJa545TzOKv1ZSvzH/kob+aVhi0saLF9KDS7+Xv8Ys4N1xXzPFSGO4ujeEPRvPB28dzNDJomI8Dqpw43TaZ8sMfY9GClrdOOnRafM7dpW+FqkBp+IDvFB6zCywlbV4sNEDVngGUQNlPJpalR15U8HMkCho1ZtEERneHkspjMftHwoytK4V+/TL+YuyEjxDoqDm34ekE9sYmTyaLH9SPm8TqYi/Gp8nt6+wA1r2k83bidyyEOYnTOUgagU5weufQiTClsQcK8VQ1yORwsp/XZSyR0/KuzZRqTONARQGBOuRNG+XmUSkCk600NLfL629bWNaX2AiXzaP0kgLETueynboGSqRgvOKtDEBACGfC2dxp4RJK7RQ3ll8sDjt3W1EF+55rl1mMydQ6cKAMMVf6Kr4GD1aukdtz5WamMdyIljezjgmmKrt81eGW4KJzDtPGW/EXueiH1xo0NAGH0Jd4DTooTpmGJOW1Dj9DvFxVbgxzV2wRaI8XdN5Z+04fSSZd9EzNfb+5slxPaV+bnGljMMbuMdmx4bx8BaM+WjWWsuYR61HuyPDbXPTd+y0LwGBfZSg9gA="
+
+matrix:
+  include:
+    - stage: Build
+      
+      # Dragonboard
+      dist: xenial
+      name: Dragonboard
+      env: BUILD_TYPE=dragonboard
+           DOCKER=danielguramulta/aditof-sdk-debian
+
+      # Raspberrypi3
+    - dist: xenial
+      name: Raspberrypi3
+      env: BUILD_TYPE=raspberrypi3
+           DOCKER=danielguramulta/aditof-sdk-raspbian
+
+      #CLANG 7
+    - env: COMPILER=clang++-7
+      addons: { apt: { packages: ["clang-7", "cmake"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-7"] } }
+
+    - env: COMPILER=clang++-8
+           CMAKE_OPTIONS="-DWITH_EXAMPLES=on -DWITH_PYTHON=on -DWITH_OPENCV=on"
+      addons: { apt: { packages: ["clang-8", "cmake"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-8"] } }
+
+      #GCC 7
+    - env: COMPILER=g++-7 
+      addons: { apt: { packages: ["g++-7", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
+
+      #GCC 8
+    - env: COMPILER=g++-8
+           CMAKE_OPTIONS="-DWITH_EXAMPLES=on -DWITH_PYTHON=on -DWITH_OPENCV=on"
+      addons: { apt: { packages: ["g++-8", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
+    
+    - env: ROS_DISTRO=kinetic
+           ROS_CI_DESKTOP="`lsb_release -cs`"
+           CATKIN_OPTIONS=$TRAVIS_BUILD_DIR/bindings/ros/catkin.options
+           ROS_PARALLEL_JOBS='-j8 -l6'
+           ROS_EXAMPLES=true
+           
+    # TODO: enable MacOS builds again when the sdk will support MacOS
+    #   #MacOS Mojave
+    # - compiler: "clang"
+    #   os: osx
+    #   osx_image: xcode11
+    #   env: CMAKE_OPTIONS=-DWITH_EXAMPLES=on
+    #   addons: { homebrew: { packages: ["libuvc", "opencv"]}}
+
+    #   #MacOS High Sierra
+    # - compiler: "clang"
+    #   os: osx
+    #   osx_image: xcode10.1
+    #   addons: { homebrew: { packages: ["libuvc"], update: true }}
+
+    - stage: Code Quality
+
+      #Check if the code is formated properly
+      env: BUILD_TYPE=clang_format
+      addons: { apt: { packages: ["clang-format-6.0", "cmake"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-6.0"] } }
+
+      #Cppcheck static analysis
+    - dist: xenial
+      env: BUILD_TYPE=cppcheck
+      addons: { apt: { packages: ["cppcheck", "cmake"] } }
+
+    - stage: Deploy Documentation
+
+      #Deploy doxygen
+      dist: xenial
+      env: BUILD_TYPE=deploy_doxygen
+      addons: { apt: { packages: ["cmake", "graphviz"] } }
 
 before_install:
     - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
@@ -29,16 +96,77 @@ before_install:
     - rosdep update
 
 install:
-  - mkdir -p ~/catkin_ws/src
-  # Create the devel/setup.bash (run catkin_make with an empty workspace) and
-  # source it to set the path variables.
-  - cd ~/catkin_ws
-  - source /opt/ros/$ROS_DISTRO/setup.bash
-  - catkin_make
-  - source devel/setup.bash
-  # Add the package under integration to the workspace using a symlink.
-  - cd ~/catkin_ws/src
-  - ln -s $TRAVIS_BUILD_DIR/bindings/ros/aditof_roscpp .
+  ############################################################################
+  # Setup used compiler and make sure to override CXX env variable.
+  ############################################################################
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+  - ${CXX} --version
 
+  ############################################################################
+  # All dependencies will be placed in a /deps folder
+  ############################################################################
+  - export DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR}
+
+  ############################################################################
+  # Install dependencies for each BUILD_TYPE specified as env variable
+  ############################################################################
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig:$PKG_CONFIG_PATH"; fi
+  - ./ci/travis/deps.sh
+
+  ############################################################################
+  # Setup path to python executable for pybind11 to use
+  ############################################################################
+  - export PYTHON=$(python-config --prefix)/bin/python3
+
+before_script:
+
+  ############################################################################
+  # Config git user for travis to use to push documentation
+  ############################################################################
+  - git config --global user.name "Travis Bot"
+  - git config --global user.email "<>"
+
+  ############################################################################
+  # Disable examples building by default if no CMAKE_OPTIONS are specified
+  ############################################################################
+  - if [[ "$CMAKE_OPTIONS" == "" ]]; then export CMAKE_OPTIONS="-DWITH_EXAMPLES=off"; fi
+
+  ############################################################################
+  # If the sdk will be built make sure to setup the build folder and execute
+  # cmake inside it using the specified CMAKE_OPTIONS of each build
+  ############################################################################
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      export CMAKE_OPTIONS="-DOPENSSL_INCLUDE_DIRS=`pkg-config --variable=includedir openssl` $CMAKE_OPTIONS"
+    fi
+
+  - |
+    if [[ "$BUILD_TYPE" == "" ]]; then
+      pushd "${TRAVIS_BUILD_DIR}"
+      mkdir build && cd build && cmake .. ${CMAKE_OPTIONS} -DPYTHON_EXECUTABLE=${PYTHON} -DCMAKE_PREFIX_PATH="${DEPS_DIR}/installed/glog;${DEPS_DIR}/installed/protobuf;${DEPS_DIR}/installed/websockets;${DEPS_DIR}/installed/opencv;";
+      popd
+    fi
+  
+  - |
+    if [[ "$ROS_EXAMPLES" == true ]]; then
+      pushd "${TRAVIS_BUILD_DIR}/build"
+      mkdir -p catkin_ws/src && cd catkin_ws
+      source /opt/ros/$ROS_DISTRO/setup.bash
+      catkin_make
+      cd src
+      ln -s $TRAVIS_BUILD_DIR/bindings/ros/aditof_roscpp .
+      popd
+    fi
+ 
 script:
-  - source /opt/ros/$ROS_DISTRO/setup.bash
+  ############################################################################
+  # Run the build
+  ############################################################################
+  - ./ci/travis/run_build.sh
+  - pushd "${TRAVIS_BUILD_DIR}/build"
+  - sudo make install
+  - cd "catkin_ws"
+  - source devel/setup.bash
+  - catkin_make
+  -popd
