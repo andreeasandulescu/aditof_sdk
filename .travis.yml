@@ -47,11 +47,13 @@ matrix:
            CMAKE_OPTIONS="-DWITH_EXAMPLES=on -DWITH_PYTHON=on -DWITH_OPENCV=on"
       addons: { apt: { packages: ["g++-8", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
     
-    - env: ROS_DISTRO=kinetic
-           ROS_CI_DESKTOP="`lsb_release -cs`"
-           CATKIN_OPTIONS=$TRAVIS_BUILD_DIR/bindings/ros/catkin.options
-           ROS_PARALLEL_JOBS='-j8 -l6'
-           ROS_EXAMPLES=true
+    - env: 
+        global:
+              ROS_DISTRO=kinetic
+              ROS_CI_DESKTOP="`lsb_release -cs`"
+              CATKIN_OPTIONS=$TRAVIS_BUILD_DIR/bindings/ros/catkin.options
+              ROS_PARALLEL_JOBS='-j8 -l6'
+              ROS_EXAMPLES=true
            
     # TODO: enable MacOS builds again when the sdk will support MacOS
     #   #MacOS Mojave
