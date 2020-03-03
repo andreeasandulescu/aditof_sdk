@@ -136,7 +136,7 @@ before_script:
     fi
   
   - |
-    if [[ "$ROS_EXAMPLES" == true ]]; then
+    if [[ $ROS_EXAMPLES == true ]]; then
       pushd "${TRAVIS_BUILD_DIR}/build"
       mkdir -p catkin_ws/src && cd catkin_ws
       source /opt/ros/$ROS_DISTRO/setup.bash
