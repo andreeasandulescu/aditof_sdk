@@ -30,7 +30,8 @@ matrix:
       env: BUILD_TYPE=raspberrypi3
            DOCKER=danielguramulta/aditof-sdk-raspbian
     
-    - env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
+    - dist: bionic
+      env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
            WITH_ROS_EXAMPLES=true
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_EXAMPLES=true
