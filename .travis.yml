@@ -29,26 +29,10 @@ matrix:
       name: Raspberrypi3
       env: BUILD_TYPE=raspberrypi3
            DOCKER=danielguramulta/aditof-sdk-raspbian
-
-      #CLANG 7
-    - env: COMPILER=clang++-7
-      addons: { apt: { packages: ["clang-7", "cmake"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-7"] } }
-
-    - env: COMPILER=clang++-8
-           CMAKE_OPTIONS="-DWITH_EXAMPLES=on -DWITH_PYTHON=on -DWITH_OPENCV=on"
-      addons: { apt: { packages: ["clang-8", "cmake"], sources: ["ubuntu-toolchain-r-test", "llvm-toolchain-trusty-8"] } }
-
-      #GCC 7
-    - env: COMPILER=g++-7 
-      addons: { apt: { packages: ["g++-7", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
-
-      #GCC 8
-    - env: COMPILER=g++-8
-           CMAKE_OPTIONS="-DWITH_EXAMPLES=on -DWITH_PYTHON=on -DWITH_OPENCV=on"
-      addons: { apt: { packages: ["g++-8", "cmake"], sources: ["ubuntu-toolchain-r-test"] } }
     
-    - env: ROS_DISTRO=kinetic
-           CATKIN_OPTIONS=${TRAVIS_BUILD_DIR}/bindings/ros/catkin.options
+    - env: ROS_DISTRO=melodic
+           CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
+           WITH_ROS_EXAMPLES=true
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_EXAMPLES=true
            
@@ -88,8 +72,8 @@ before_install:
     - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu ${TRAVIS_DIST} main\" > /etc/apt/sources.list.d/ros-latest.list"
     - sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     - sudo apt-get update -qq
-    - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-${ROS_DISTRO}-ros-base 
-    - if [ "{$ROS_EXAMPLES}" ] ;  sudo apt-get install -y ros-${ROS_DISTRO}-rviz ; fi
+    - sudo apt-get install -y python-catkin-pkg ros-${ROS_DISTRO}-ros-base 
+    - if [ "{$WITH_ROS_EXAMPLES}" ] ;  sudo apt-get install -y ros-${ROS_DISTRO}-rviz ; fi
     - source /opt/ros/${ROS_DISTRO}/setup.bash
     - sudo rosdep init
     - rosdep update
@@ -163,9 +147,3 @@ script:
   # Run the build
   ############################################################################
   - ./ci/travis/run_build.sh
-  - pushd "${TRAVIS_BUILD_DIR}/build"
-  - sudo make install
-  - cd "catkin_ws"
-  - source devel/setup.bash
-  - catkin_make
-  - popd
