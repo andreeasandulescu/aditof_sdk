@@ -20,7 +20,7 @@ if(UNIX)
 	    )
 
 	add_custom_target(aditof_ros_package ALL)
-	add_custom_command(TARGET aditof_ros_package
+	add_custom_command(TARGET aditof_ros_package POST_BUILD
 			COMMAND ${CMAKE_BINARY_DIR}/ros_setup.bash
 			DEPENDS aditof
 			)
