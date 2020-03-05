@@ -41,7 +41,7 @@ matrix:
       env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_DISTRO=melodic
-      addons: { apt: { packages: ["python-catkin-pkg", "ros-${ROS_DISTRO}-ros-base", "ros-${ROS_DISTRO}-rviz"] } }
+      addons: { apt: { packages: ["python-catkin-pkg", "ros-$ROS_DISTRO-ros-base", "ros-$ROS_DISTRO-rviz"] } }
 
     # TODO: enable MacOS builds again when the sdk will support MacOS
     #   #MacOS Mojave
@@ -75,6 +75,16 @@ matrix:
       env: BUILD_TYPE=deploy_doxygen
       addons: { apt: { packages: ["cmake", "graphviz"] } }
 
+before_install:
+ - |
+    if [[ -n "${ROS_DISTRO+1}" ]]; then
+      sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu ${TRAVIS_DIST} main" > /etc/apt/sources.list.d/ros-latest.list'
+      sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+      if [ "{$ROS_DISTRO}"  = "melodic" ] ; then sudo apt update -qq ; else sudo apt-get update -qq  fi 
+      source /opt/ros/${ROS_DISTRO}/setup.bash
+      sudo rosdep init
+      rosdep update
+    fi
 
 install:
   ############################################################################
@@ -129,16 +139,6 @@ before_script:
       popd
     fi
     
-  - |
-    if [[ -n "${ROS_DISTRO+1}" ]]; then
-      sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu ${TRAVIS_DIST} main" > /etc/apt/sources.list.d/ros-latest.list'
-      sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-      if [ "{$ROS_DISTRO}"  = "melodic" ] ; then sudo apt update -qq ; else sudo apt-get update -qq  fi 
-      source /opt/ros/${ROS_DISTRO}/setup.bash
-      sudo rosdep init
-      rosdep update
-    fi
-
 
 script:
   ############################################################################
