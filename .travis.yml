@@ -30,9 +30,9 @@ matrix:
       env: BUILD_TYPE=raspberrypi3
            DOCKER=danielguramulta/aditof-sdk-raspbian
        
-    -dist: xenial
-     name: "Xenial kinetic"
-     env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
+    - dist: xenial
+      name: "Xenial kinetic"
+      env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_DISTRO=kinetic
      
