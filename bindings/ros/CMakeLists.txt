@@ -1,22 +1,27 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-if (NOT DEFINED ROS_DISTRO)
-    set(ROS_DISTRO "melodic")
+if(UNIX)
+
+	#set variables
+	if(NOT DEFINED CATKIN_WS)
+		message("-- Creating catkin workspace in build directory")
+		set(CATKIN_WS "${CMAKE_BINARY_DIR}/catkin_ws")
+	else()
+		message("-- Creating catkin workspace in user chosen directory: ${CATKIN_WS}")
+	endif()
+	set(ROS_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+	#create and run ROS setup script
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ros_setup.bash ${CMAKE_BINARY_DIR}/tmp/ros_setup.bash)
+	file(
+	    COPY ${CMAKE_BINARY_DIR}/tmp/ros_setup.bash
+	    DESTINATION ${CMAKE_BINARY_DIR}
+	    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+	    )
+
+	add_custom_target(aditof_ros_package ALL)
+	add_custom_command(TARGET aditof_ros_package
+			COMMAND ${CMAKE_BINARY_DIR}/ros_setup.bash
+			DEPENDS aditof
+			)
 endif()
-
-add_custom_target(ros_setup ALL)
-
-add_custom_command (TARGET ros_setup PRE_BUILD
-		COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build
-		COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/devel
-		COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/install
-		)
-
-file (COPY /opt/ros/${ROS_DISTRO}/setup.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/devel/ FILE_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ)
-
-add_custom_command (TARGET ros_setup
-		COMMAND ${CMAKE_CURRENT_BINARY_DIR}/devel/setup.sh
-		COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/aditof_roscpp -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/devel/install -DCATKIN_DEVEL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/devel
-		
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/build
-		)
