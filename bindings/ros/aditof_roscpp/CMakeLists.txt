@@ -8,7 +8,12 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
 )
-find_package(aditof REQUIRED)
+
+#if we create the catkin_ws directory inside the build directory, find_package is not needed
+if(CMAKE_SOURCE_DIR MATCHES ".*aditof_sdk/build.*")
+else()
+	find_package(aditof REQUIRED)
+endif()
 
 catkin_package(
   INCLUDE_DIRS include
