@@ -76,7 +76,7 @@ matrix:
       addons: { apt: { packages: ["cmake", "graphviz"] } }
 
 before_install:
-  - if [[ -z "${ROS_DISTRO}" ]]; then ./ci/travis/ros_config.sh ; fi
+  - if [[ "${ROS_DISTRO}" != "" ]]; then ./ci/travis/ros_config.sh ; fi
 
 install:
   ############################################################################
