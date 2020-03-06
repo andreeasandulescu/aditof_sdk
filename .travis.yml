@@ -41,7 +41,6 @@ matrix:
       env: CMAKE_OPTIONS="-DWITH_EXAMPLES=off -DWITH_ROS=on"
            ROS_PARALLEL_JOBS='-j8 -l6'
            ROS_DISTRO=melodic
-      addons: { apt: { packages: ["ros-$ROS_DISTRO-rviz"] } }
 
     # TODO: enable MacOS builds again when the sdk will support MacOS
     #   #MacOS Mojave
