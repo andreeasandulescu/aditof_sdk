@@ -4,11 +4,10 @@ sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31
 if [[ "{$ROS_DISTRO}"  = "melodic" ]]
 then 
   sudo apt update -qq
-  sudo apt install -y python-catkin-pkg ros-$ROS_DISTRO-ros-base
+  sudo apt install -y ros-$ROS_DISTRO-ros-base
 else
   sudo apt-get update -qq
-  sudo apt-get install -y python-catkin-pkg ros-$ROS_DISTRO-ros-base
+  sudo apt-get install -y ros-$ROS_DISTRO-ros-base
 fi
-source /opt/ros/${ROS_DISTRO}/setup.bash
 sudo rosdep init
 rosdep update
