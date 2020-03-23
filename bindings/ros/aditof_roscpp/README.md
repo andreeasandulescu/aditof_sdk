@@ -1,7 +1,7 @@
-# ROS Wrapper for the aditof library
+# ROS Wrapper for the ADI ToF library
 
 ## Overview
-TODO
+This ROS package facilitates depth and IR data acquisition and processing for the Analog Devices depth cameras.
 
 ## Installation
 
