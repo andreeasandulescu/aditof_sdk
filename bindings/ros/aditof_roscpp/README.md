@@ -27,12 +27,12 @@ sudo cmake --build . --target install
 TODO
 - Examples
   - Visualize point cloud in rviz
-  ```console
-  cd catkin_ws
-  source devel/setup.bash
-  roslaunch aditof_roscpp rviz_publisher.launch
-   ```
-  The last command should be run for cameras using an USB connection. For Ethernet\Wi-Fi connections, you should specify the camera's IP address, using the ip parameter, as shown below 
-  ```console
-  roslaunch aditof_roscpp rviz_publisher.launch ip:="127.0.0.1"
-  ```
+    ```console
+    cd catkin_ws
+    source devel/setup.bash
+    roslaunch aditof_roscpp rviz_publisher.launch
+     ```
+     The last command should be run for cameras using an USB connection. For Ethernet\Wi-Fi connections, you should specify the camera's IP address, using the ip parameter, as shown below 
+      ```console
+      roslaunch aditof_roscpp rviz_publisher.launch ip:="127.0.0.1"
+      ```
