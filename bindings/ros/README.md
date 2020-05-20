@@ -28,6 +28,9 @@ sudo cmake --build . --target install
   ```console
   cmake --build . --target aditof_ros_package
   ```
+  
+  //TODO
+  disable examples at build
 
 ## Usage
 - Camera node
