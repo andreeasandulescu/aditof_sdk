@@ -52,10 +52,17 @@ sudo cmake --build . --target install
     ```
 
  ### ***Note:***
- In case you wish to launch nodes using the rosrun command instead of roslaunch
-
- //TODO
-
+ *In case you wish to launch nodes using the rosrun command instead of roslaunch, you should run each node specified in the launchfile in a different terminal. For example, this line*
+```console
+roslaunch aditof_roscpp camera_node.launch ip:="127.0.0.1"
+```
+*will be replaced with these lines*
+ 
+```console
+roscore
+rosrun aditof_roscpp aditof_camera_node 127.0.0.1
+rosrun rqt_reconfigure rqt_reconfigure
+```
 ## Published Topics
 The aditof_camera_node publishes messages defined by the [sensor_msgs](http://wiki.ros.org/sensor_msgs) package on the following topics
 - /aditof_roscpp/aditof_camera_info
