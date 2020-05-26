@@ -75,3 +75,4 @@ Using the [dynamic_reconfigure](http://wiki.ros.org/dynamic_reconfigure) package
 
 
 //TODO
+![Display Image](https://github.com/analogdevicesinc/aditof_sdk/blob/master/doc/img/ros_rqt_reconfigure.png)
