@@ -71,4 +71,4 @@ The aditof_camera_node publishes messages defined by the [sensor_msgs](http://wi
 ## Update parameters at runtime using
 Using the [dynamic_reconfigure](http://wiki.ros.org/dynamic_reconfigure) package, the aditof_ros_package offers the users the possibility to update the camera parameters
 
-<p align="center"><img src="https://github.com/andreeasandulescu/aditof_sdk/blob/master/doc/img/ros_rqt_reconfigure.png" /></p>
+<p align="center"><img src="../../doc/img/ros_rqt_reconfigure.png" /></p>
